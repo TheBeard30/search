@@ -35,6 +35,60 @@ class Sorted{
 
 }
 
+/**
+ * 二叉堆
+ */
+class BinaryHeap{
+    constructor(data,compareFn){
+        this.data = data;
+        this.compareFn = compareFn;
+    }
+
+    take(){
+        if(!this.data.length) return null;
+        let min = this.data[0];
+        let i = 0;
+        // fix heap
+        while(i < this.data.length){
+            if(i * 2 + 1 >= this.data.length){
+                break;
+            }
+            if(i * 2 + 2 >= this.data.length){
+                this.data[i] = this.data[i * 2 + 1];
+                i = i * 2 + 1;
+                break;
+            }
+            if(this.compareFn(this.data[i * 2 + 1],this.data[i * 2 + 2]) < 0){
+                this.data[i] = this.data[i * 2 + 1];
+                i = i * 2 + 1;
+            }else{
+                this.data[i] = this.data[i * 2 + 2];
+                i = i * 2 + 2; 
+            }
+        }
+        
+        this.insertAt(i,this.data.pop());
+        return min;
+    }
+
+    insertAt(i,v){
+        this.data[i] = v;
+        while(i > 0 && this.compareFn(v,this.data[Math.floor((i - 1)/2)]) < 0){
+            this.data[i] = this.data[Math.floor((i - 1)/2)];
+            this.data[Math.floor((i - 1)/2)] = v;
+            i = Math.floor((i - 1)/2);
+        }
+    }
+
+    insert(v){
+        this.insertAt(this.data.length,v);
+    }
+
+    get length(){
+        return this.data.length;
+    }
+}
+
 
 
 const map = localStorage.map ? JSON.parse(localStorage.map) : new Array(10000).fill(0);
@@ -104,7 +158,7 @@ async function findPath(map, start, end){
     function distance([x,y]){
         return (x - end[0]) ** 2 + (y - end[1]) ** 2;
     }
-    const collection = new Sorted([start],(a,b) => distance(a) - distance(b));
+    const collection = new Sorted([start],(a,b) => distance(a) - distance(b));  // 可以使用二叉堆
 
     async function insert( [x, y],pre ){
         if(map[y * 100 + x] !== 0){
