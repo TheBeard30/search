@@ -1,3 +1,41 @@
+class Sorted{
+    constructor(data,compareFn){
+        this.data = data;
+        this.compareFn = compareFn;
+    }
+    
+    /**
+     * 取出最小数
+     * @returns 
+     */
+    take(){
+        if(!this.data.length) return null;
+        let min = this.data[0];
+        let minIndex = 0;
+        for(let i = 1; i < this.data.length; i++){
+            if(this.compareFn(this.data[i],min) < 0){
+                min = this.data[i];
+                minIndex = i;
+            }
+        }
+        this.data[minIndex] = this.data[this.data.length - 1];
+        this.data.pop();
+        return min;
+    }
+
+    insert(v){
+        this.data.push(v);
+    }
+
+
+    get length(){
+        return this.data.length;
+    }
+
+
+}
+
+
 
 const map = localStorage.map ? JSON.parse(localStorage.map) : new Array(10000).fill(0);
 const container = document.getElementById('container');
@@ -52,7 +90,21 @@ function sleep(t){
  **/
 async function findPath(map, start, end){
     map = map.slice();
+    // 起点
+    container.children[start[1] * 100 + start[0]].style.backgroundColor = 'blue';
+    // 终点
+    container.children[end[1] * 100 + end[0]].style.backgroundColor = 'red';
+
+
+
+    // 广度优先搜索
     const queue = [start];
+
+    // A*搜索
+    function distance([x,y]){
+        return (x - end[0]) ** 2 + (y - end[1]) ** 2;
+    }
+    const collection = new Sorted([start],(a,b) => distance(a) - distance(b));
 
     async function insert( [x, y],pre ){
         if(map[y * 100 + x] !== 0){
@@ -62,20 +114,32 @@ async function findPath(map, start, end){
             return;
         }
         map[y * 100 + x] = pre;
-        container.children[y * 100 + x].style.backgroundColor = 'lightgreen';
+        if(x != start[0] && y != start[1] && x != end[0] && y != end[1]){
+            container.children[y * 100 + x].style.backgroundColor = 'lightgreen';
+        }
+        
         await sleep(1);
-        queue.push([x,y]);
+        // 广度优先搜索
+        // queue.push([x,y]);
+        
+        // A*搜索
+        collection.insert([x,y]);
     }
 
+    
+    while(collection.length){   // 如果为广度优先搜索，则为 queue.length
+        // 广度优先搜索
+        // let [x,y] = queue.shift();
 
-    while(queue.length){
-        let [x,y] = queue.shift();
+        // A*搜索
+        let [x,y] = collection.take();
 
         if(x == end[0] && y == end[1]){
             const path = [];
             while(x !== start[0] || y !== start[1]){
                 path.push([x,y]);
-                container.children[y * 100 + x].style.backgroundColor = 'pink';
+                if(x !== end[0] || y !== end[1])
+                    container.children[y * 100 + x].style.backgroundColor = 'pink';
                 [x,y] = map[y *100 + x];
             }
             return path;
