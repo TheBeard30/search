@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>search</title>
+        <meta charset="utf-8">
+        <style>
+            #container{
+                width: 701px;
+                line-height: 0px;
+            }
+            .cell{
+                display: inline-block;
+                width: 6px;
+                height: 6px;
+                background-color: gray;
+                border-bottom: 1px solid white;
+                border-right: 1px solid white;
+                vertical-align: middle;
+            }
+        </style>
+    </head>
+    <body>
+        <div id='container'></div>
+        <button onclick="localStorage.map = JSON.stringify(map)">保存</button>
+    </body>
+    <script src="search.js"></script>
+</html>
